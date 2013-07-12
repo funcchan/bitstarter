@@ -50,7 +50,9 @@ var checkHtmlFile = function(htmlfile, checksfile) {
     var out = {};
     for(var ii in checks) {
         var present = $(checks[ii]).length > 0;
-        out[checks[ii]] = present;
+        if (checks[ii]!=".navigation"){
+           out[checks[ii]] = present;
+        }
     }
     return out;
 };
@@ -63,11 +65,16 @@ var clone = function(fn) {
 
 if(require.main == module) {
     program
-        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .option('-f, --file <html_file>', 'Path to index.html', clone(assertFileExists), HTMLFILE_DEFAULT)
+        .option('-c, --checks <check_file>', 'Path to checks.json', clone(assertFileExists), CHECKSFILE_DEFAULT)
         .parse(process.argv);
     var checkJson = checkHtmlFile(program.file, program.checks);
     var outJson = JSON.stringify(checkJson, null, 4);
+
+    var fs = require('fs');
+    var outfile = "outJson.txt";
+    fs.writeFileSync(outfile,outJson+'\n');
+
     console.log(outJson);
 } else {
     exports.checkHtmlFile = checkHtmlFile;
